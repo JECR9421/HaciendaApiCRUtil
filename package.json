@@ -1,0 +1,32 @@
+{
+  "name": "haciendaapicrutil",
+  "version": "1.0.0",
+  "description": "nodejs micro services deploy for docker to connect and send data to hacienda's Costa Rica",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JECR9421/HaciendaApiCRUtil.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/JECR9421/HaciendaApiCRUtil/issues"
+  },
+  "homepage": "https://github.com/JECR9421/HaciendaApiCRUtil#readme",
+  "dependencies": {
+    "body-parser": "^1.20.2",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "nodemon": "^2.0.22"
+  },
+  "devDependencies": {
+    "eslint": "^8.38.0",
+    "eslint-config-standard": "^17.0.0",
+    "eslint-plugin-import": "^2.27.5",
+    "eslint-plugin-n": "^15.7.0",
+    "eslint-plugin-promise": "^6.1.1"
+  }
+}
