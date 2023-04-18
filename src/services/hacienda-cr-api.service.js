@@ -2,12 +2,13 @@ const fs = require('fs')
 const { downloadFileFromCloud } = require('../utils/cloud.util')
 const getTokenIdp = require('../utils/get-token-idp')
 const { loadDataFromXml } = require('../utils/xml.util')
+const { sendToHacienda } = require('../utils/hacienda-cr.util')
 const { BUCKET_BASE } = process.env
 const TEMP_PATH = `${process.cwd()}/temp`
 const getToken = async ({ usuariohacienda, passhacienda, Tipo }) => {
   const token = await getTokenIdp({ usuariohacienda, passhacienda, Tipo })
   console.log('token', JSON.stringify(token))
-  return token
+  return token?.access_token
 }
 
 const xmlCloudFileHandler = async (path, clave) => {
@@ -27,19 +28,28 @@ async function sendBillingToHacienda ({
   callback,
   isReception = false
 }) {
-  const token = await getToken({ usuariohacienda, passhacienda, Tipo })
-  let xmlPath = null
-  if (!xmlSigned) {
-    await xmlCloudFileHandler(path, clave)
-    xmlPath = `${TEMP_PATH}/${clave}_signed.xml`
+  try {
+    const token = await getToken({ usuariohacienda, passhacienda, Tipo })
+    let xmlPath = null
+    if (!xmlSigned) {
+      await xmlCloudFileHandler(path, clave)
+      xmlPath = `${TEMP_PATH}/${clave}_signed.xml`
+    }
+    const payLoad = loadDataFromXml({
+      path: xmlPath,
+      xmlSigned,
+      clave,
+      isReception,
+      callbackUrl: callback
+    }).createPayLoad()
+    const result = await sendToHacienda(token, payLoad, Tipo)
+    if (!xmlSigned) fs.unlinkSync(xmlPath)
+    return result
+  } catch (error) {
+    const errorMessage = `Unhandled exception at send ${JSON.stringify(error)}`
+    console.error('Unhandled exception at send', JSON.stringify(error))
+    throw errorMessage
   }
-  const payLoad = loadDataFromXml({
-    path: xmlPath,
-    xmlSigned,
-    clave,
-    isReception,
-    callbackUrl: callback
-  }).createPayLoad()
 }
 
 module.exports = { sendBillingToHacienda }
