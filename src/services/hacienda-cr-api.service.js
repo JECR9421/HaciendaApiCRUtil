@@ -1,13 +1,18 @@
 const fs = require('fs')
+const mcache = require('memory-cache')
 const { downloadFileFromCloud } = require('../utils/cloud.util')
 const getTokenIdp = require('../utils/get-token-idp')
 const { loadDataFromXml } = require('../utils/xml.util')
 const { sendToHacienda } = require('../utils/hacienda-cr.util')
 const { BUCKET_BASE } = process.env
 const TEMP_PATH = `${process.cwd()}/temp`
+const getCacheKeyUser = (user) => Buffer.from(user).toString('base64')
 const getToken = async ({ usuariohacienda, passhacienda, Tipo }) => {
+  const cacheKey = getCacheKeyUser(usuariohacienda)
+  const tokenCache = mcache.get(cacheKey)
+  if (tokenCache) return tokenCache
   const token = await getTokenIdp({ usuariohacienda, passhacienda, Tipo })
-  console.log('token', JSON.stringify(token))
+  mcache.put(cacheKey, token?.access_token, 240000)
   return token?.access_token
 }
 
