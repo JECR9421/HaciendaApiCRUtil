@@ -3,7 +3,7 @@ const mcache = require('memory-cache')
 const { downloadFileFromCloud } = require('../utils/cloud.util')
 const getTokenIdp = require('../utils/get-token-idp')
 const { loadDataFromXml } = require('../utils/xml.util')
-const { sendToHacienda } = require('../utils/hacienda-cr.util')
+const { sendToHacienda, getBillingStatusApi } = require('../utils/hacienda-cr.util')
 const { BUCKET_BASE } = process.env
 const TEMP_PATH = `${process.cwd()}/temp`
 const getCacheKeyUser = (user) => Buffer.from(user).toString('base64')
@@ -57,4 +57,21 @@ async function sendBillingToHacienda ({
   }
 }
 
-module.exports = { sendBillingToHacienda }
+async function getBillingStatus ({
+  clave,
+  usuariohacienda,
+  passhacienda,
+  Tipo
+}) {
+  try {
+    const token = await getToken({ usuariohacienda, passhacienda, Tipo })
+    const result = await getBillingStatusApi(token, clave, Tipo)
+    return result
+  } catch (error) {
+    const errorMessage = `Unhandled exception at get status ${JSON.stringify(error)}`
+    console.error('Unhandled exception at get status', JSON.stringify(error))
+    throw errorMessage
+  }
+}
+
+module.exports = { sendBillingToHacienda, getBillingStatus }

@@ -7,4 +7,9 @@ const router = express.Router()
  */
 router.post('/send', haciendaController.send)
 
+/**
+ * Get current state of a billing
+ */
+router.post('/get-status', haciendaController.get)
+
 module.exports = router
