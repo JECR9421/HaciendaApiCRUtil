@@ -13,4 +13,4 @@ RUN npm install --production
 # Copy everything in current /app directory 
 COPY . .
 # Strat the node application
-CMD [ "node", "server.js" ]
+CMD [ "node", "index.js" ]
