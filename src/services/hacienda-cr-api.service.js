@@ -16,11 +16,13 @@ const getToken = async ({ usuariohacienda, passhacienda, Tipo }) => {
   return token?.access_token
 }
 
-const xmlCloudFileHandler = async (path, clave) => {
-  const bucket = path ?? BUCKET_BASE // TODO DIVISOFT FROK SI getDateFromClave
-  // TODO PATH PARA DIVISOFT EN EL FROK CONVERTIR PATH FS A CLOUD
+const xmlCloudFileHandler = async (path, path2, clave) => {
   const key = `${clave}_signed.xml`
-  await downloadFileFromCloud(bucket, key, `${TEMP_PATH}/${key}`)
+  try {
+    await downloadFileFromCloud(path, key, `${TEMP_PATH}/${key}`)
+  } catch (error) {
+    await downloadFileFromCloud(path2, key, `${TEMP_PATH}/${key}`)
+  }
 }
 
 async function sendBillingToHacienda ({
@@ -30,6 +32,7 @@ async function sendBillingToHacienda ({
   passhacienda,
   Tipo,
   path = null,
+  path2 = null,
   callback,
   isReception = false
 }) {
@@ -37,7 +40,7 @@ async function sendBillingToHacienda ({
     const token = await getToken({ usuariohacienda, passhacienda, Tipo })
     let xmlPath = null
     if (!xmlSigned) {
-      await xmlCloudFileHandler(path, clave)
+      await xmlCloudFileHandler(path, path2, clave)
       xmlPath = `${TEMP_PATH}/${clave}_signed.xml`
     }
     const payLoad = loadDataFromXml({
