@@ -12,5 +12,6 @@ COPY ["package.json", "package-lock.json*", "./"]
 RUN npm install --production
 # Copy everything in current /app directory 
 COPY . .
+EXPOSE 3000
 # Strat the node application
 CMD [ "node", "index.js" ]
