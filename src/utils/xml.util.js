@@ -6,6 +6,13 @@ const Person = require('../models/hacienda-cr-person.model')
 const loadFromFile = (path) => {
   return fs.readFileSync(path, 'utf8')
 }
+
+const typeDoc = (billing) => {
+  if (billing.FacturaElectronica) return 'FacturaElectronica'
+  if (billing.TiqueteElectronico) return 'TiqueteElectronico'
+  // TODO NOTAS CREDITO
+}
+
 const loadDataFromXml = ({
   path,
   xmlSigned,
@@ -23,7 +30,8 @@ const loadDataFromXml = ({
     base64 = xmlSigned
   }
   const billingPure = JSON.parse(convert.xml2json(xml, { compact: true, spaces: 4 }))
-  const { FacturaElectronica: { FechaEmision: { _text: date }, Emisor: sender, Receptor: recipient } } = billingPure
+  const type = typeDoc(billingPure)
+  const { FechaEmision: { _text: date }, Emisor: sender, Receptor: recipient } = billingPure[type]
   const { Identificacion: senderId } = sender
   let recipientId = null
   if (isReception) ({ Identifacion: recipientId } = recipient)

@@ -16,7 +16,8 @@ app.use('/hacienda-cr', haciendaRouter)
 
 app.use((err, req, res, next) => {
   console.error(err.stack)
-  logger(`Unhandle error:\n${JSON.stringify(req)}\n${JSON.stringify(err)}`, 'error')
+  logger(`Unhandle error:${err}`, 'error')
+  logger(`Unhandle error:\n${JSON.stringify(req)}\n${err}`, 'error')
   res.status(500).send({ error: 'Something went wrong!' })
 })
 

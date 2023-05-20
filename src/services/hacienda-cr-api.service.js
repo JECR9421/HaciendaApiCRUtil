@@ -51,8 +51,8 @@ async function sendBillingToHacienda ({
     if (!xmlSigned) fs.unlinkSync(xmlPath)
     return result
   } catch (error) {
-    const errorMessage = `Unhandled exception at send ${JSON.stringify(error)}`
-    console.error('Unhandled exception at send', JSON.stringify(error))
+    const errorMessage = `Unhandled exception at send ${error}`
+    console.error('Unhandled exception at send', errorMessage)
     throw errorMessage
   }
 }
