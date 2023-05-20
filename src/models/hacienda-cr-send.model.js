@@ -8,8 +8,8 @@ function SendBillingRequest (clave, fecha, comprobanteXml, emisor, receptor = nu
 
   this.createPayLoad = () => {
     const payLoad = { ...this }
-    if (!receptor?.tipoIdentificacion) delete payLoad.receptor
-    if (!callbackUrl) delete payLoad.callback
+    if (!this.receptor?.tipoIdentificacion) delete payLoad.receptor
+    if (!this.callbackUrl) delete payLoad.callback
     return payLoad
   }
 }
