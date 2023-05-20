@@ -13,7 +13,7 @@ const now = () => {
 
   const time = hour + ':' + minute + ':' + seconds
   const month = ((today.getMonth() + 1) < 10) ? `0${today.getMonth() + 1}` : `${today.getMonth() + 1}`
-  const day = (today.getDate() < 10) ? `0${today.getDate()}` : `0${today.getDate()}`
+  const day = (today.getDate() < 10) ? `0${today.getDate()}` : `${today.getDate()}`
   const timeStamp = {
     date: today.getFullYear() + '-' + month + '-' + day
   }
