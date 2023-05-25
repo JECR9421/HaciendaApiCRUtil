@@ -10,7 +10,9 @@ const loadFromFile = (path) => {
 const typeDoc = (billing) => {
   if (billing.FacturaElectronica) return 'FacturaElectronica'
   if (billing.TiqueteElectronico) return 'TiqueteElectronico'
-  // TODO NOTAS CREDITO
+  if (billing.NotaCreditoElectronica) return 'NotaCreditoElectronica'
+  if (billing.NotaDebitoElectronica) return 'NotaDebitoElectronica'
+  // TODO LAS DE RECEPCION
 }
 
 const loadDataFromXml = ({
