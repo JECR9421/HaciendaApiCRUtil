@@ -12,6 +12,8 @@ const typeDoc = (billing) => {
   if (billing.TiqueteElectronico) return 'TiqueteElectronico'
   if (billing.NotaCreditoElectronica) return 'NotaCreditoElectronica'
   if (billing.NotaDebitoElectronica) return 'NotaDebitoElectronica'
+  if (billing.FacturaElectronicaCompra) return 'FacturaElectronicaCompra'
+  if (billing.MensajeReceptor) return 'MensajeReceptor'
   // TODO LAS DE RECEPCION
 }
 
