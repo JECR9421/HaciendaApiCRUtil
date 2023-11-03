@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 # Base Image of node 
-FROM node:18.12.0
+FROM node:18-alpine
 #Set ENV veriable
 ENV NODE_ENV=production
 
