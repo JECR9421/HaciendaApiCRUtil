@@ -1,6 +1,6 @@
 const fs = require('fs')
 const mcache = require('memory-cache')
-const { downloadFileFromCloud } = require('../utils/cloud.util')
+const { downloadFileFromCloud, convertFileSystemToCloud } = require('../utils/cloud.util')
 const getTokenIdp = require('../utils/get-token-idp')
 const { loadDataFromXml } = require('../utils/xml.util')
 const { sendToHacienda, getBillingStatusApi } = require('../utils/hacienda-cr.util')
@@ -31,13 +31,15 @@ async function sendBillingToHacienda ({
   Tipo,
   path = null,
   callback,
-  isReception = false
+  isReception = false,
+  isExternal = null
 }) {
   try {
     const token = await getToken({ usuariohacienda, passhacienda, Tipo })
     let xmlPath = null
     if (!xmlSigned) {
-      await xmlCloudFileHandler(path, clave)
+      const pathCloud = (isExternal && isExternal === 'S') ? convertFileSystemToCloud(path) : path
+      await xmlCloudFileHandler(pathCloud, clave)
       xmlPath = `${TEMP_PATH}/${clave}_signed.xml`
     }
     const payLoad = loadDataFromXml({
