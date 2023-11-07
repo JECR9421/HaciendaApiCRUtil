@@ -4,7 +4,7 @@ const { downloadFileFromCloud, convertFileSystemToCloud } = require('../utils/cl
 const getTokenIdp = require('../utils/get-token-idp')
 const { loadDataFromXml } = require('../utils/xml.util')
 const { sendToHacienda, getBillingStatusApi } = require('../utils/hacienda-cr.util')
-const { BUCKET_BASE } = process.env
+const { BUCKET_BASE, BUCKET_BASE2 } = process.env
 const TEMP_PATH = `${process.cwd()}/temp`
 const getCacheKeyUser = (user) => Buffer.from(user).toString('base64')
 const getToken = async ({ usuariohacienda, passhacienda, Tipo }) => {
@@ -16,11 +16,29 @@ const getToken = async ({ usuariohacienda, passhacienda, Tipo }) => {
   return token?.access_token
 }
 
+const getTempPathFromClave = (clave) => {
+  const day = clave.substring(3, 5)
+  const month = clave.substring(5, 7)
+  const year = `20${clave.substring(7, 9)}`
+  const folder = `${day}-${month}-${year}`
+  return folder
+}
+
+const getBucketBase = (clave) => ({
+  path: `${BUCKET_BASE}/${getTempPathFromClave(clave)}`,
+  path2: `${BUCKET_BASE2}/${getTempPathFromClave(clave)}`
+})
+
 const xmlCloudFileHandler = async (path, clave) => {
-  const bucket = path ?? BUCKET_BASE // TODO DIVISOFT FROK SI getDateFromClave
+  const bucket = path ?? getBucketBase(clave) // TODO DIVISOFT FROK SI getDateFromClave
   // TODO PATH PARA DIVISOFT EN EL FROK CONVERTIR PATH FS A CLOUD
   const key = `${clave}_signed.xml`
-  await downloadFileFromCloud(bucket, key, `${TEMP_PATH}/${key}`)
+  try {
+    const path1 = typeof bucket === 'object' ? bucket.path : bucket
+    await downloadFileFromCloud(path1, key, `${TEMP_PATH}/${key}`)
+  } catch (error) {
+    await downloadFileFromCloud(bucket.path2, key, `${TEMP_PATH}/${key}`)
+  }
 }
 
 async function sendBillingToHacienda ({
@@ -38,7 +56,11 @@ async function sendBillingToHacienda ({
     const token = await getToken({ usuariohacienda, passhacienda, Tipo })
     let xmlPath = null
     if (!xmlSigned) {
-      const pathCloud = (isExternal && isExternal === 'S') ? convertFileSystemToCloud(path) : path
+      const pathCloud = (isExternal && isExternal === 'S')
+        ? convertFileSystemToCloud(path)
+        : (path !== '')
+            ? path
+            : null
       await xmlCloudFileHandler(pathCloud, clave)
       xmlPath = `${TEMP_PATH}/${clave}_signed.xml`
     }
