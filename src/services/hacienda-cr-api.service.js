@@ -49,8 +49,9 @@ async function sendBillingToHacienda ({
   Tipo,
   path = null,
   callback,
-  isReception = false,
-  isExternal = null
+  isExternal = null,
+  recepcionSenderIdType = null,
+  recepcionRecipentIdType = null
 }) {
   try {
     const token = await getToken({ usuariohacienda, passhacienda, Tipo })
@@ -68,13 +69,15 @@ async function sendBillingToHacienda ({
       path: xmlPath,
       xmlSigned,
       clave,
-      isReception,
-      callbackUrl: callback
+      callbackUrl: callback,
+      recepcionSenderIdType,
+      recepcionRecipentIdType
     }).createPayLoad()
     const result = await sendToHacienda(token, payLoad, Tipo)
     if (!xmlSigned) fs.unlinkSync(xmlPath)
     return result
   } catch (error) {
+    console.error(error)
     const errorMessage = `Unhandled exception at send ${error}`
     console.error('Unhandled exception at send', errorMessage)
     throw errorMessage
