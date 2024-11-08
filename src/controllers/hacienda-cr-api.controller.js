@@ -6,7 +6,6 @@ const formatResponse = (req, res) => `response ${req.method} ${req.url} ${req.ho
 async function send (req, res, next) {
   try {
     const result = await sendBillingToHacienda(req.body)
-    logger(formatResponse(req, result))
     res.json(result)
   } catch (err) {
     res.status(500).json(err)
@@ -18,7 +17,6 @@ async function send (req, res, next) {
 async function get (req, res, next) {
   try {
     const result = await getBillingStatus(req.body)
-    logger(formatResponse(req, result))
     res.json(result)
   } catch (err) {
     res.status(500).json(err)
