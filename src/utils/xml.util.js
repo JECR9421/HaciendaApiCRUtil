@@ -21,8 +21,9 @@ const loadDataFromXml = ({
   path,
   xmlSigned,
   clave,
-  isReception = false,
-  callbackUrl
+  callbackUrl,
+  recepcionSenderIdType = null,
+  recepcionRecipentIdType = null
 }) => {
   let xml = null
   let base64 = null
@@ -35,11 +36,23 @@ const loadDataFromXml = ({
   }
   const billingPure = JSON.parse(convert.xml2json(xml, { compact: true, spaces: 4 }))
   const type = typeDoc(billingPure)
-  const { FechaEmision: { _text: date }, Emisor: sender, Receptor: recipient } = billingPure[type]
-  const { Identificacion: senderId } = sender
-  let recipientId = null
-  if (isReception) ({ Identifacion: recipientId } = recipient)
-  return new SendBillingRequest(clave, date, base64, new Person(senderId), new Person(recipientId), callbackUrl)
+  const isReception = type === 'MensajeReceptor'
+  let sender = null
+  let recipient = null
+  if (!isReception) {
+    sender = billingPure[type]?.Emisor
+    recipient = billingPure[type]?.Receptor
+  } else {
+    sender = { type: recepcionSenderIdType, number: billingPure[type]?.NumeroCedulaEmisor?._text }
+    recipient = { type: recepcionRecipentIdType, number: billingPure[type]?.NumeroCedulaReceptor?._text }
+  }
+  const date = billingPure[type]?.FechaEmision?._text ?? billingPure[type]?.FechaEmisionDoc?._text
+  if (!isReception) {
+    const { Identificacion: senderId } = sender
+    return new SendBillingRequest(clave, date, base64, new Person(senderId), null, callbackUrl)
+  } else {
+    return new SendBillingRequest(clave, date, base64, new Person(null, sender), new Person(null, recipient), callbackUrl)
+  }
 }
 
 module.exports = { loadDataFromXml }
