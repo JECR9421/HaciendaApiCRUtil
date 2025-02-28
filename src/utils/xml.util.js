@@ -14,7 +14,7 @@ const typeDoc = (billing) => {
   if (billing.NotaDebitoElectronica) return 'NotaDebitoElectronica'
   if (billing.FacturaElectronicaCompra) return 'FacturaElectronicaCompra'
   if (billing.MensajeReceptor) return 'MensajeReceptor'
-  // TODO LAS DE RECEPCION
+  if (billing.FacturaElectronicaExportacion) return 'FacturaElectronicaExportacion'
 }
 
 const loadDataFromXml = ({
