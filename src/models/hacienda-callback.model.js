@@ -5,7 +5,7 @@ const URL =  MONGO_URI;
 const DB = MONGO_DB;
 
 const getDocument = async (clave) => {
-    const client = new MongoClient(URL, { useUnifiedTopology: true });
+    const client = new MongoClient(URL);
     try {
         await client.connect();
         const database = client.db(DB);
@@ -20,7 +20,7 @@ const getDocument = async (clave) => {
 };
 
 const insertDocument = async (document) => {
-    const client = new MongoClient(URL, { useUnifiedTopology: true });
+    const client = new MongoClient(URL);
     try {
         await client.connect();
         const database = client.db(DB);
