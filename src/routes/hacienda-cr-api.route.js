@@ -12,4 +12,9 @@ router.post('/send', haciendaController.send)
  */
 router.post('/get-status', haciendaController.get)
 
+/**
+ * Default callback
+ */
+router.post('/callback', haciendaController.callbackDefault)
+
 module.exports = router

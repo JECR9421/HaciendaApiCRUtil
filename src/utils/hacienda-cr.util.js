@@ -2,9 +2,11 @@ const axios = require('axios')
 const getSendUrl = (mode) => mode === 'P' ? process.env.URL_SEND_PROD : process.env.URL_SEND_STAGE
 const getStatusUrl = (mode) => mode === 'P' ? process.env.URL_SEND_PROD : process.env.URL_SEND_STAGE
 const ERROR_CODE = 400
+const { URL_CALLBACK_DEFAULT } = process.env
 const sendToHacienda = async (token, payLoad, mode) => {
   try {
     const url = getSendUrl(mode)
+    if (!payLoad.callbackUrl) payLoad.callbackUrl = URL_CALLBACK_DEFAULT
     const res = await axios.post(url, payLoad, {
       headers: {
         Authorization: `bearer ${token}`,

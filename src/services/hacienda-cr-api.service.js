@@ -4,6 +4,7 @@ const { downloadFileFromCloud, convertFileSystemToCloud } = require('../utils/cl
 const getTokenIdp = require('../utils/get-token-idp')
 const { loadDataFromXml } = require('../utils/xml.util')
 const { sendToHacienda, getBillingStatusApi } = require('../utils/hacienda-cr.util')
+const { getDocument } = require('../models/hacienda-callback.model')
 const { BUCKET_BASE, BUCKET_BASE2 } = process.env
 const TEMP_PATH = `${process.cwd()}/temp`
 const getCacheKeyUser = (user) => Buffer.from(user).toString('base64')
@@ -91,6 +92,12 @@ async function getBillingStatus ({
   Tipo
 }) {
   try {
+     try {
+      const document = await getDocument(clave)
+      if (document) return document
+     } catch (error) {
+      console.error('Unhandled exception at get status mongo', JSON.stringify(error))
+     }
     const token = await getToken({ usuariohacienda, passhacienda, Tipo })
     const result = await getBillingStatusApi(token, clave, Tipo)
     return result
