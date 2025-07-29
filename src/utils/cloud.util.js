@@ -16,17 +16,27 @@ const convertFileSystemToCloud = (path) => {
 }
 // Cambiar por axios llamado a api cloud files
 // donde bucket es path, bucket va ser quemado fedocumentsstorage y fileName = key, base64 = 'true'
-const dowloadFile = (bucket, key) => S3.getObject({
-  Bucket: bucket,
-  Key: key
-}).promise()
+const dowloadFile = async(bucket, key) => {
+  const axios = require('axios');
+
+let config = {
+  method: 'get',
+  maxBodyLength: Infinity,
+  url: `http://209.126.7.137:5010/api/download-file?bucket=fedocumentsstorage&folder=${bucket.replace('fedocumentsstorage/', '')}&fileName=${key}`,
+  headers: { }
+};
+
+const response = await axios.request(config);
+return response.data;
+
+}
 
 const downloadFileFromCloud = async (bucket, key, localPath) => {
   //Modificar aqui replace bucket quitar fedocumentsstorage
   const file = await dowloadFile(bucket, key)
   const dir = path.dirname(localPath)
   if (!fs.existsSync(dir)) { fs.mkdirSync(dir) }
-  fs.writeFileSync(localPath, file.Body) // modificar por un escritor de base64 a file
+  fs.writeFileSync(localPath, file) // modificar por un escritor de base64 a file
   //fs.writeFile(filePath, Buffer.from(file.result, 'base64')
   if (!fs.existsSync(localPath)) throw new Error(`Fail downloading file ${bucket}/${key}`)
 }
