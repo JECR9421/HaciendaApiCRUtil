@@ -1,4 +1,5 @@
 const fs = require('fs')
+const convert = require('xml-js')
 const mcache = require('memory-cache')
 const { downloadFileFromCloud, convertFileSystemToCloud } = require('../utils/cloud.util')
 const getTokenIdp = require('../utils/get-token-idp')
@@ -40,6 +41,15 @@ const xmlCloudFileHandler = async (path, clave) => {
   } catch (error) {
     await downloadFileFromCloud(bucket.path2, key, `${TEMP_PATH}/${key}`)
   }
+}
+
+const handleRejectDocument = (respuestaHacienda) => { 
+  const respuestaXml = Buffer.from(respuestaHacienda['respuesta-xml'], 'base64').toString('utf-8')
+  const respuestaObj = JSON.parse(convert.xml2json(respuestaXml, { compact: true, spaces: 4 }))
+  if (respuestaObj?.MensajeHacienda) {
+    return respuestaObj?.MensajeHacienda?.DetalleMensaje?._text ?? ''
+  } 
+  return '';
 }
 
 async function sendBillingToHacienda ({
@@ -94,12 +104,20 @@ async function getBillingStatus ({
   try {
      try {
       const document = await getDocument(clave)
-      if (document) return document
+      if (document) {
+         if(document['ind-estado'] && document['ind-estado'] === 'rechazado') {
+            return { ...document, rejectReason: handleRejectDocument(document) }
+         }
+         return document
+      }
      } catch (error) {
       console.error('Unhandled exception at get status mongo', JSON.stringify(error))
      }
     const token = await getToken({ usuariohacienda, passhacienda, Tipo })
     const result = await getBillingStatusApi(token, clave, Tipo)
+    if(result['ind-estado'] && result['ind-estado'] === 'rechazado') {
+      return { ...result, rejectReason: handleRejectDocument(result) }
+   }
     return result
   } catch (error) {
     const errorMessage = `Unhandled exception at get status ${JSON.stringify(error)}`
